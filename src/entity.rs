@@ -1,4 +1,5 @@
 use std::marker::Reflect;
+use std::any::Any;
 use std::collections::BTreeMap;
 use heterogenous_set::HeterogenousSet;
 use components::GetComponent;
@@ -38,6 +39,16 @@ impl EntityStore {
     ) {
         if let Some(l) = self.entities.get_mut(&id) {
             l.insert(component);
+        }
+    }
+
+    pub fn set_raw_component(
+        &mut self,
+        id: EntityId,
+        component: Box<Any>
+    ) {
+        if let Some(l) = self.entities.get_mut(&id) {
+            l.insert_raw(component);
         }
     }
 

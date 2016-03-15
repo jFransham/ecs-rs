@@ -24,5 +24,10 @@ impl HeterogenousSet {
         let type_id = TypeId::of::<T>();
         self.content.insert(type_id, Box::new(element) as Box<Any>);
     }
+
+    pub fn insert_raw(&mut self, element: Box<Any>) {
+        let type_id = element.get_type_id();
+        self.content.insert(type_id, element);
+    }
 }
 

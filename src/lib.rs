@@ -1,4 +1,5 @@
 #![feature(reflect_marker)]
+#![feature(get_type_id)]
 
 #[macro_use]
 mod macros;
