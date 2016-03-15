@@ -2,6 +2,11 @@
 name = "ecs-rs"
 version = "0.1.0"
 authors = ["Jack Fransham <moonfudgeman@hotmail.co.uk>"]
+description = "A super-simple entity-component system in Rust"
+license = "GPL-3.0"
+documentation = "https://github.com/jFransham/ecs-rs"
+homepage = "https://github.com/jFransham/ecs-rs"
+repository = "https://github.com/jFransham/ecs-rs"
 
 [lib]
 name="simple_ecs"
