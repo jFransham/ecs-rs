@@ -1,14 +1,16 @@
 macro_rules! component {
     ($t:ty) => {
-        impl SetComponent for $t {}
+        impl $crate::components::SetComponent for $t {}
     };
 }
 
 macro_rules! impl_tuple_components {
     (($t:ident $(, $rest:ident )*)) => {
-        impl<'a, $t: GetComponent<'a>, $( $rest: GetComponent<'a> ),*>
-            GetComponent<'a> for ($t, $( $rest ),*)
-        {
+        impl<
+            'a,
+            $t: $crate::components::GetComponent<'a>,
+            $( $rest: $crate::components::GetComponent<'a> ),*
+        >GetComponent<'a> for ($t, $( $rest ),*) {
             type Out = (
                 $t::Out,
                 $(
@@ -18,7 +20,8 @@ macro_rules! impl_tuple_components {
 
             #[allow(non_snake_case)]
             fn get_component<'b: 'a>(
-                es: &'b EntityStore, entity: EntityId
+                es: &'b $crate::entity::EntityStore,
+                entity: $crate::entity::EntityId
             ) -> Option<Self::Out> {
                 $t::get_component(es, entity)
                     .and_then(|first|
@@ -38,7 +41,9 @@ macro_rules! impl_tuple_components {
         {
             #[allow(non_snake_case)]
             fn set_component(
-                self, es: &mut EntityStore, entity: EntityId
+                self,
+                es: &mut $crate::entity::EntityStore,
+                entity: $crate::entity::EntityId
             ) {
                 let ($t, $( $rest ,)*) = self;
                 $t.set_component(es, entity);
@@ -54,9 +59,19 @@ macro_rules! impl_tuple_components {
     };
     (()) => {
         impl<'a> GetComponent<'a> for () {
+            type Out = ();
+
             fn get_component<'b: 'a>(_: &'b EntityStore, _: EntityId) -> Option<Self> {
                 Some(())
             }
+        }
+
+        impl SetComponent for () {
+            fn set_component(
+                self,
+                _: &mut $crate::entity::EntityStore,
+                _: $crate::entity::EntityId
+            ) {}
         }
     };
 }
