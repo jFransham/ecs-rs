@@ -1,0 +1,3 @@
+Make SetComponent into Component (and make EntityStore require it on *_component
+so that one can opt in to adding components, to avoid accidental adding of
+components)

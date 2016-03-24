@@ -14,7 +14,7 @@ pub trait SetComponent: Sized + Reflect + 'static {
     }
 }
 
-impl<'a, T: Sized + Reflect + 'static> GetComponent<'a> for &'static T {
+impl<'a, 'any, T: Sized + Reflect + 'static> GetComponent<'a> for &'any T {
     type Out = &'a T;
 
     fn get_component<'b: 'a>(

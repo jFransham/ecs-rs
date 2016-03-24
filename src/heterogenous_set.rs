@@ -26,7 +26,7 @@ impl HeterogenousSet {
     }
 
     pub fn insert_raw(&mut self, element: Box<Any>) {
-        let type_id = element.get_type_id();
+        let type_id = (*element).get_type_id();
         self.content.insert(type_id, element);
     }
 }
