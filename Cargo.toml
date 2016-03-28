@@ -1,6 +1,6 @@
 [package]
 name = "simple_ecs"
-version = "0.1.4"
+version = "0.1.5"
 authors = ["Jack Fransham <moonfudgeman@hotmail.co.uk>"]
 description = "A super-simple entity-component system in Rust"
 license = "GPL-3.0"
