@@ -1,4 +1,4 @@
 [root]
-name = "ecs-rs"
-version = "0.1.1"
+name = "simple_ecs"
+version = "0.1.3"
 

@@ -8,3 +8,4 @@ mod heterogenous_set;
 pub mod entity;
 pub mod components;
 pub mod system;
+pub mod either;

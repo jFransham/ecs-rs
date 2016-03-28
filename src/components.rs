@@ -1,4 +1,5 @@
 use std::marker::Reflect;
+use either::Either;
 use entity::{EntityId, EntityStore};
 
 pub trait GetComponent<'a>: Sized {
@@ -22,6 +23,25 @@ impl<'a, 'any, T: Sized + Reflect + 'static> GetComponent<'a> for &'any T {
         entity: EntityId
     ) -> Option<Self::Out> {
         es.get_component::<T>(entity)
+    }
+}
+
+impl<'a, A: GetComponent<'a>, B: GetComponent<'a>> GetComponent<'a>
+    for Either<A, B>
+{
+    type Out = Either<A::Out, B::Out>;
+
+    fn get_component<'b: 'a>(
+        es: &'b EntityStore,
+        entity: EntityId
+    ) -> Option<Self::Out> {
+        if let Some(a) = A::get_component(es, entity) {
+            Some(Either::Left(a))
+        } else if let Some(b) = B::get_component(es, entity) {
+            Some(Either::Right(b))
+        } else {
+            None
+        }
     }
 }
 
