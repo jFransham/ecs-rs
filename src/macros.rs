@@ -75,3 +75,29 @@ macro_rules! impl_tuple_components {
         }
     };
 }
+
+macro_rules! impl_tuple_system {
+    (($t:ident $(, $rest:ident )*)) => {
+        impl<
+            __U__,
+            $t: $crate::system::System<__U__>,
+            $( $rest: $crate::system::System<__U__> ),*
+        >SystemContainer<__U__> for ($t, $( $rest ),*) {
+            #[allow(non_snake_case)]
+            fn update_all(&mut self, es: &mut EntityStore, ud: &__U__) {
+                let &mut (ref mut $t, $( ref mut $rest ),*) = self;
+
+                $t.update(es, ud);
+                $(
+                    $rest.update(es, ud);
+                )*
+            }
+        }
+
+        impl_tuple_system! {
+            ( $( $rest ),* )
+        }
+    };
+    (()) => {
+    };
+}

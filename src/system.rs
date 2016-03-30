@@ -1,91 +1,76 @@
+use std::marker::PhantomData;
 use components::{GetComponent, SetComponent};
 use entity::{EntityId, EntityStore};
 
-pub trait System<Messages, UpdateData> {
-    fn update_all(&mut self, es: &mut EntityStore, ud: &UpdateData);
+pub trait System<UpdateData> {
+    fn update(
+        &mut self,
+        es: &mut EntityStore,
+        ud: &UpdateData,
+    );
 }
 
-pub trait SimpleSystem<Messages, UpdateData> {
+pub trait SimpleSystem<UpdateData> {
     type Input: for<'b> GetComponent<'b>;
     type Output: SetComponent;
 
-    fn update<'b>(
+    fn update_simple<'b>(
         &mut self,
         entities: &[(EntityId, <Self::Input as GetComponent<'b>>::Out)],
         ud: &UpdateData
-    ) -> Vec<(EntityId, Self::Output, Messages)>;
-
-    fn handle_messages(
-        &mut self,
-        _: &mut EntityStore,
-        m: Messages
-    ) -> Messages {
-        m
-    }
+    ) -> Vec<(EntityId, Self::Output)>;
 }
 
-impl<M, U, T: SimpleSystem<M, U>> System<M, U> for T {
-    fn update_all(&mut self, es: &mut EntityStore, ud: &U) {
+impl<U, T: SimpleSystem<U>> System<U> for T {
+    fn update(&mut self, es: &mut EntityStore, ud: &U) {
         let pairs = {
             let ents = es.entity_component_pairs::<T::Input>();
-            self.update(&ents, ud)
+            self.update_simple(&ents, ud)
         };
 
-        for (e, c, _) in pairs {
+        for (e, c) in pairs {
             c.set_component(es, e);
         }
     }
 }
 
-/*
-pub trait ReadonlySystem<Messages>: Send + Sync {
-    type Input: for<'b> GetComponent<'b>;
-
-    fn update<'b>(
-        &mut self,
-        entities: &[(EntityId, <Self::Input as GetComponent<'b>>::Out)]
-    );
+pub trait SystemContainer<U> {
+    fn update_all(&mut self, _: &mut EntityStore, _: &U);
 }
 
-impl<Messages, T: ReadonlySystem<Messages>> SimpleSystem<Messages> for T {
-    type Input = T::Input;
-    type Output = ();
-
-    fn update<'b>(
-        &mut self,
-        entities: &[(EntityId, <Self::Input as GetComponent<'b>>::Out)]
-    ) -> Vec<(EntityId, (), Messages)> {
-        ReadonlySystem::update(self, entities);
-        vec![]
-    }
-}
-*/
-
-pub struct SystemStore<Messages, UpdateData> {
-    entity_store: EntityStore,
-    systems: Vec<Box<System<Messages, UpdateData>>>,
-}
-
-impl<Messages, UpdateData> SystemStore<Messages, UpdateData> {
-    pub fn new<M, U>() -> SystemStore<M, U> {
-        SystemStore {
-            entity_store: EntityStore::new(),
-            systems: vec![],
+impl<U> SystemContainer<U> for Vec<Box<System<U>>> {
+    fn update_all(&mut self, es: &mut EntityStore, ud: &U) {
+        for s in self {
+            s.update(es, &ud);
         }
     }
+}
 
-    pub fn with_systems(
-        s: Vec<Box<System<Messages, UpdateData>>>
-    ) -> SystemStore<Messages, UpdateData> {
+impl_tuple_system! {
+    (
+        A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X,
+        Y, Z
+    )
+}
+
+pub struct SystemStore<
+    U, T: SystemContainer<U> = Vec<Box<System<U>>>
+> {
+    entity_store: EntityStore,
+    systems: T,
+    _p: PhantomData<U>,
+}
+
+impl<U, T: SystemContainer<U>> SystemStore<U, T> {
+    pub fn with_systems(s: T) -> Self {
         SystemStore {
             entity_store: EntityStore::new(),
             systems: s,
+            _p: PhantomData,
         }
     }
 
-    pub fn update(&mut self, ud: UpdateData) {
-        for s in self.systems.iter_mut() {
-            s.update_all(&mut self.entity_store, &ud);
-        }
+    pub fn update(&mut self, ud: U) {
+        self.systems.update_all(&mut self.entity_store, &ud);
     }
 }
