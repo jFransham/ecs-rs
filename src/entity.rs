@@ -2,7 +2,7 @@ use std::marker::Reflect;
 use std::any::Any;
 use std::collections::BTreeMap;
 use heterogenous_set::HeterogenousSet;
-use components::GetComponent;
+use components::{GetComponent, SetComponent};
 
 pub type EntityId = usize;
 
@@ -28,15 +28,15 @@ impl EntityStore {
             .collect::<Vec<_>>()
     }
 
-    pub fn get_component<T: Reflect + 'static>(&self, id: EntityId) -> Option<&T> {
+    pub fn get_component<'a, T: Reflect + 'static>(
+        &self, id: EntityId
+    ) -> Option<&T> {
         self.entities.get(&id).and_then(|l| l.get::<T>())
     }
 
-    pub fn set_component<T: Reflect + 'static>(
-        &mut self,
-        id: EntityId,
-        component: T
-    ) {
+    pub fn set_component<
+        T: Reflect + SetComponent + 'static
+    >(&mut self, id: EntityId, component: T) {
         if let Some(l) = self.entities.get_mut(&id) {
             l.insert(component);
         }
@@ -63,6 +63,7 @@ impl EntityStore {
         while self.entities.contains_key(&next) {
             next += 1;
         }
+
         self.next_id = next;
 
         entity

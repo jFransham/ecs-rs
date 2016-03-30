@@ -15,6 +15,23 @@ pub trait SetComponent: Sized + Reflect + 'static {
     }
 }
 
+impl<T: SetComponent> SetComponent for Option<T> {
+    fn set_component(self, es: &mut EntityStore, entity: EntityId) {
+        if let Some(c) = self {
+            c.set_component(es, entity);
+        }
+    }
+}
+
+impl<A: SetComponent, B: SetComponent> SetComponent for Either<A, B> {
+    fn set_component(self, es: &mut EntityStore, entity: EntityId) {
+        match self {
+            Either::Left(c) => c.set_component(es, entity),
+            Either::Right(c) => c.set_component(es, entity),
+        }
+    }
+}
+
 impl<'a, 'any, T: Sized + Reflect + 'static> GetComponent<'a> for &'any T {
     type Out = &'a T;
 
