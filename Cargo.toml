@@ -12,4 +12,4 @@ repository = "https://github.com/jFransham/ecs-rs"
 name="simple_ecs"
 
 [dependencies]
-dynamic = "*"
+dynamic = "0.2.1"
