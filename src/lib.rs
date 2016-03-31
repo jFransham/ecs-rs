@@ -1,5 +1,6 @@
 #![feature(reflect_marker)]
-#![feature(get_type_id)]
+
+extern crate dynamic;
 
 #[macro_use]
 mod macros;

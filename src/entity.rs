@@ -1,6 +1,6 @@
 use std::marker::Reflect;
-use std::any::Any;
 use std::collections::BTreeMap;
+use dynamic::Dynamic;
 use heterogenous_set::HeterogenousSet;
 use components::{GetComponent, SetComponent};
 
@@ -45,7 +45,7 @@ impl EntityStore {
     pub fn set_raw_component(
         &mut self,
         id: EntityId,
-        component: Box<Any>
+        component: Box<Dynamic>
     ) {
         if let Some(l) = self.entities.get_mut(&id) {
             l.insert_raw(component);
