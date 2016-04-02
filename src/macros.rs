@@ -80,19 +80,25 @@ macro_rules! impl_tuple_system {
     (($t:ident $(, $rest:ident )*)) => {
         impl<
             __U__,
+            __M__,
             __S__,
-            $t: $crate::system::System<__U__, __S__>,
-            $( $rest: $crate::system::System<__U__, __S__> ),*
-        >SystemContainer<__U__, __S__> for ($t, $( $rest ),*) {
+            $t: $crate::system::System<__U__, __M__, __S__>,
+            $(
+                $rest: $crate::system::System<__U__, __M__, __S__>
+            ),*
+        >SystemSet<__U__, __M__, __S__> for ($t, $( $rest ),*) {
             #[allow(non_snake_case)]
             fn update_all(
-                &mut self, es: &mut EntityStore, ud: &__U__
+                &mut self,
+                mb: &mut Vec<__M__>,
+                es: &mut EntityStore,
+                ud: &__U__
             ) -> Option<__S__> {
                 let &mut (ref mut $t, $( ref mut $rest ),*) = self;
 
-                $t.update(es, ud)
+                $t.update(mb, es, ud)
                 $(
-                    .or_else(|| $rest.update(es, ud))
+                    .or_else(|| $rest.update(mb, es, ud))
                 )*
             }
         }

@@ -1,4 +1,5 @@
 #![feature(reflect_marker)]
+#![feature(associated_type_defaults)]
 
 extern crate dynamic;
 
