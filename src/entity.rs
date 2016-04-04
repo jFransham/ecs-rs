@@ -4,7 +4,8 @@ use dynamic::Dynamic;
 use heterogenous_set::HeterogenousSet;
 use components::{GetComponent, SetComponent};
 
-pub type EntityId = usize;
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct EntityId(usize);
 
 pub struct EntityStore {
     next_id: EntityId,
@@ -13,7 +14,7 @@ pub struct EntityStore {
 
 impl EntityStore {
     pub fn new() -> EntityStore {
-        EntityStore { next_id: 0, entities: BTreeMap::new() }
+        EntityStore { next_id: EntityId(0), entities: BTreeMap::new() }
     }
 
     pub fn entity_component_pairs<
@@ -59,12 +60,12 @@ impl EntityStore {
 
         self.entities.insert(entity, HeterogenousSet::new());
 
-        let mut next = self.next_id + 1;
-        while self.entities.contains_key(&next) {
+        let mut next = self.next_id.0 + 1;
+        while self.entities.contains_key(&EntityId(next)) {
             next += 1;
         }
 
-        self.next_id = next;
+        self.next_id = EntityId(next);
 
         entity
     }
