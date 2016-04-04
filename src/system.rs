@@ -2,7 +2,7 @@ use std::marker::PhantomData;
 use components::{GetComponent, SetComponent};
 use entity::{EntityId, EntityStore};
 
-pub trait System<UpdateData, Message, SystemState: Sized> {
+pub trait System<UpdateData, Message, SystemState: Sized = ()> {
     fn update(
         &mut self,
         msgs: &mut Vec<Message>,
